@@ -7,8 +7,9 @@ const api = {
   git: {
     // 仓库操作
     init: (path: string) => ipcRenderer.invoke('git:init', path),
-    clone: (url: string, path: string) => ipcRenderer.invoke('git:clone', url, path),
-    open: (path: string) => ipcRenderer.invoke('git:open', path),
+    clone: (url: string, path: string) => ipcRenderer.invoke('git:clone', { url, path }),
+    selectRepo: () => ipcRenderer.invoke('git:selectRepo'),
+    openRepo: (path: string) => ipcRenderer.invoke('git:openRepo', path),
     
     // 状态和历史
     status: () => ipcRenderer.invoke('git:status'),
@@ -19,41 +20,43 @@ const api = {
     
     // 暂存区操作
     add: (files: string[]) => ipcRenderer.invoke('git:add', files),
-    reset: (files: string[]) => ipcRenderer.invoke('git:reset', files),
-    commit: (message: string, options?: { amend?: boolean }) =>
-      ipcRenderer.invoke('git:commit', message, options),
+    addAll: () => ipcRenderer.invoke('git:addAll'),
+    reset: (files?: string[]) => ipcRenderer.invoke('git:reset', files),
+    commit: (options: { message: string; amend?: boolean }) =>
+      ipcRenderer.invoke('git:commit', options),
     
     // 分支操作
-    branch: (options?: { list?: boolean; create?: string; delete?: string }) =>
-      ipcRenderer.invoke('git:branch', options),
-    checkout: (ref: string, options?: { create?: boolean }) =>
-      ipcRenderer.invoke('git:checkout', ref, options),
-    merge: (branch: string, options?: { noFf?: boolean }) =>
-      ipcRenderer.invoke('git:merge', branch, options),
+    branches: () => ipcRenderer.invoke('git:branches'),
+    createBranch: (name: string, checkout = true) =>
+      ipcRenderer.invoke('git:createBranch', name, checkout),
+    checkout: (ref: string) => ipcRenderer.invoke('git:checkout', ref),
+    deleteBranch: (name: string, force = false) =>
+      ipcRenderer.invoke('git:deleteBranch', name, force),
+    merge: (branch: string) => ipcRenderer.invoke('git:merge', branch),
     
     // 远程操作
     fetch: (remote?: string) => ipcRenderer.invoke('git:fetch', remote),
-    pull: (remote?: string, branch?: string) =>
-      ipcRenderer.invoke('git:pull', remote, branch),
-    push: (remote?: string, branch?: string, options?: { force?: boolean; setUpstream?: boolean }) =>
-      ipcRenderer.invoke('git:push', remote, branch, options),
+    pull: (options?: { remote?: string; branch?: string; rebase?: boolean }) =>
+      ipcRenderer.invoke('git:pull', options),
+    push: (options?: { remote?: string; branch?: string; force?: boolean; setUpstream?: boolean }) =>
+      ipcRenderer.invoke('git:push', options),
     
     // 远程仓库管理
-    remote: (options?: { list?: boolean; add?: { name: string; url: string }; remove?: string }) =>
-      ipcRenderer.invoke('git:remote', options),
-    
-    // 标签操作
-    tag: (options?: { list?: boolean; create?: string; delete?: string; message?: string }) =>
-      ipcRenderer.invoke('git:tag', options),
+    remotes: () => ipcRenderer.invoke('git:remotes'),
+    addRemote: (name: string, url: string) =>
+      ipcRenderer.invoke('git:addRemote', name, url),
+    removeRemote: (name: string) => ipcRenderer.invoke('git:removeRemote', name),
     
     // 其他操作
-    stash: (options?: { save?: string; pop?: boolean; list?: boolean }) =>
-      ipcRenderer.invoke('git:stash', options),
+    discard: (files?: string | string[]) => ipcRenderer.invoke('git:discard', files),
+    testSSH: () => ipcRenderer.invoke('git:testSSH'),
   },
   
   // 文件系统操作
   fs: {
     selectDirectory: () => ipcRenderer.invoke('fs:selectDirectory'),
+    selectFile: (options?: { title?: string; filters?: Array<{ name: string; extensions: string[] }> }) =>
+      ipcRenderer.invoke('fs:selectFile', options),
     readFile: (path: string) => ipcRenderer.invoke('fs:readFile', path),
     writeFile: (path: string, content: string) => ipcRenderer.invoke('fs:writeFile', path, content),
     exists: (path: string) => ipcRenderer.invoke('fs:exists', path),
@@ -65,6 +68,7 @@ const api = {
     add: (path: string) => ipcRenderer.invoke('repository:add', path),
     remove: (path: string) => ipcRenderer.invoke('repository:remove', path),
     update: (path: string, data: any) => ipcRenderer.invoke('repository:update', path, data),
+    toggleFavorite: (path: string) => ipcRenderer.invoke('repository:toggleFavorite', path),
   }
 }
 

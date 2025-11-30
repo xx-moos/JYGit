@@ -1,7 +1,8 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerGitHandlers } from './git/ipcHandlers'
+import { repositoryManager } from './repository/manager'
 
 function createWindow(): void {
   // 创建浏览器窗口
@@ -35,13 +36,77 @@ function createWindow(): void {
   }
 }
 
+// 注册仓库管理 IPC 处理器
+function registerRepositoryHandlers(): void {
+  // 获取所有仓库
+  ipcMain.handle('repository:getAll', async () => {
+    return await repositoryManager.getAll()
+  })
+
+  // 添加仓库
+  ipcMain.handle('repository:add', async (_, path: string) => {
+    return await repositoryManager.add(path)
+  })
+
+  // 移除仓库
+  ipcMain.handle('repository:remove', async (_, path: string) => {
+    await repositoryManager.remove(path)
+    return { success: true }
+  })
+
+  // 更新仓库
+  ipcMain.handle('repository:update', async (_, path: string, data: any) => {
+    await repositoryManager.update(path, data)
+    return { success: true }
+  })
+
+  // 切换收藏
+  ipcMain.handle('repository:toggleFavorite', async (_, path: string) => {
+    await repositoryManager.toggleFavorite(path)
+    return { success: true }
+  })
+}
+
+// 注册文件系统 IPC 处理器
+function registerFileSystemHandlers(): void {
+  // 选择目录
+  ipcMain.handle('fs:selectDirectory', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    
+    if (result.canceled || result.filePaths.length === 0) {
+      return null
+    }
+    
+    return result.filePaths[0]
+  })
+
+  // 选择文件
+  ipcMain.handle('fs:selectFile', async (_event, options?: { title?: string; filters?: Array<{ name: string; extensions: string[] }> }) => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      title: options?.title,
+      filters: options?.filters
+    })
+    
+    if (result.canceled || result.filePaths.length === 0) {
+      return null
+    }
+    
+    return result.filePaths[0]
+  })
+}
+
 // 当 Electron 完成初始化时触发
 app.whenReady().then(() => {
   // 为 Windows 设置应用用户模型 ID
   electronApp.setAppUserModelId('com.jygit.app')
 
-  // 注册 Git IPC 处理器
+  // 注册所有 IPC 处理器
   registerGitHandlers()
+  registerRepositoryHandlers()
+  registerFileSystemHandlers()
 
   // 开发环境下默认按 F12 打开或关闭开发工具
   // 生产环境忽略 CommandOrControl + R

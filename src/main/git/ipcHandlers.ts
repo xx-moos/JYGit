@@ -333,4 +333,29 @@ export function registerGitHandlers(): void {
       }
     }
   })
+
+  // 测试 SSH 连接
+  ipcMain.handle('git:testSSH', async () => {
+    try {
+      // 使用 simple-git 测试 SSH 连接
+      // 这里简单测试是否能执行 git 命令
+      const { execSync } = require('child_process')
+      
+      // 在 Windows 上测试 SSH
+      try {
+        execSync('ssh -T git@github.com', { timeout: 5000 })
+        return true
+      } catch (error: any) {
+        // SSH 测试通常会返回非零退出码，但如果能连接就说明 SSH 配置正确
+        // GitHub 的 SSH 测试会返回 "Hi username! You've successfully authenticated"
+        if (error.stderr && error.stderr.toString().includes('successfully authenticated')) {
+          return true
+        }
+        return false
+      }
+    } catch (error) {
+      console.error('SSH test error:', error)
+      return false
+    }
+  })
 }

@@ -1,59 +1,68 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type {
-  GitStatus,
-  GitCommit,
-  GitBranch,
-  GitRemote,
-  GitTag,
-  GitDiff,
-  GitStash
-} from '../main/git/types'
-import type { Repository } from '../shared/types'
-
-interface GitAPI {
-  init: (path: string) => Promise<void>
-  clone: (url: string, path: string) => Promise<void>
-  open: (path: string) => Promise<{ path: string; name: string }>
-  status: () => Promise<GitStatus>
-  log: (options?: { maxCount?: number; ref?: string }) => Promise<GitCommit[]>
-  diff: (options?: { cached?: boolean; path?: string }) => Promise<GitDiff[]>
-  add: (files: string[]) => Promise<void>
-  reset: (files: string[]) => Promise<void>
-  commit: (message: string, options?: { amend?: boolean }) => Promise<string>
-  branch: (options?: { list?: boolean; create?: string; delete?: string }) => Promise<GitBranch[] | void>
-  checkout: (ref: string, options?: { create?: boolean }) => Promise<void>
-  merge: (branch: string, options?: { noFf?: boolean }) => Promise<void>
-  fetch: (remote?: string) => Promise<void>
-  pull: (remote?: string, branch?: string) => Promise<void>
-  push: (remote?: string, branch?: string, options?: { force?: boolean; setUpstream?: boolean }) => Promise<void>
-  remote: (options?: { list?: boolean; add?: { name: string; url: string }; remove?: string }) => Promise<GitRemote[] | void>
-  tag: (options?: { list?: boolean; create?: string; delete?: string; message?: string }) => Promise<GitTag[] | void>
-  stash: (options?: { save?: string; pop?: boolean; list?: boolean }) => Promise<GitStash[] | void>
-}
-
-interface FileSystemAPI {
-  selectDirectory: () => Promise<string | null>
-  readFile: (path: string) => Promise<string>
-  writeFile: (path: string, content: string) => Promise<void>
-  exists: (path: string) => Promise<boolean>
-}
-
-interface RepositoryAPI {
-  getAll: () => Promise<Repository[]>
-  add: (path: string) => Promise<void>
-  remove: (path: string) => Promise<void>
-  update: (path: string, data: Partial<Repository>) => Promise<void>
-}
 
 declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      git: GitAPI
-      fs: FileSystemAPI
-      repository: RepositoryAPI
+      // Git 操作相关 API
+      git: {
+        // 仓库操作
+        init: (path: string) => Promise<any>
+        clone: (url: string, path: string) => Promise<any>
+        open: (path: string) => Promise<any>
+        selectRepo: () => Promise<any>
+        openRepo: (path: string) => Promise<any>
+        
+        // 状态和历史
+        status: () => Promise<any>
+        log: (options?: { maxCount?: number; ref?: string }) => Promise<any>
+        diff: (options?: { cached?: boolean; path?: string }) => Promise<any>
+        
+        // 暂存区操作
+        add: (files: string[]) => Promise<any>
+        addAll: () => Promise<any>
+        reset: (files?: string[]) => Promise<any>
+        commit: (options: { message: string; amend?: boolean }) => Promise<any>
+        
+        // 分支操作
+        branches: () => Promise<any>
+        createBranch: (name: string, checkout?: boolean) => Promise<any>
+        checkout: (ref: string) => Promise<any>
+        deleteBranch: (name: string, force?: boolean) => Promise<any>
+        merge: (branch: string) => Promise<any>
+        
+        // 远程操作
+        fetch: (remote?: string) => Promise<any>
+        pull: (options?: { remote?: string; branch?: string; rebase?: boolean }) => Promise<any>
+        push: (options?: { remote?: string; branch?: string; force?: boolean; setUpstream?: boolean }) => Promise<any>
+        
+        // 远程仓库管理
+        remotes: () => Promise<any>
+        addRemote: (name: string, url: string) => Promise<any>
+        removeRemote: (name: string) => Promise<any>
+        
+        // 其他操作
+        discard: (files?: string | string[]) => Promise<any>
+        testSSH: () => Promise<boolean>
+      }
+      
+      // 文件系统操作
+      fs: {
+        selectDirectory: () => Promise<string | null>
+        selectFile: (options?: { title?: string; filters?: Array<{ name: string; extensions: string[] }> }) => Promise<string | null>
+        readFile: (path: string) => Promise<string>
+        writeFile: (path: string, content: string) => Promise<void>
+        exists: (path: string) => Promise<boolean>
+      }
+      
+      // 仓库管理
+      repository: {
+        getAll: () => Promise<any[]>
+        add: (path: string) => Promise<any>
+        remove: (path: string) => Promise<any>
+        update: (path: string, data: any) => Promise<any>
+        toggleFavorite: (path: string) => Promise<any>
+      }
     }
   }
 }
-
-export { GitAPI, FileSystemAPI, RepositoryAPI }

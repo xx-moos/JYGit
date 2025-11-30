@@ -1,110 +1,105 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-export interface UserSettings {
-  // Git 配置
-  userName?: string
-  userEmail?: string
-  
-  // 编辑器配置
-  editorFontSize: number
-  editorTabSize: number
-  editorWordWrap: boolean
-  
-  // 主题配置
-  theme: 'light' | 'dark' | 'auto'
-  
-  // 语言配置
+interface Settings {
+  // 通用设置
   language: 'zh-CN' | 'en-US'
-  
-  // 其他配置
-  autoFetch: boolean
-  fetchInterval: number // 分钟
-  confirmBeforePush: boolean
-  confirmBeforeDelete: boolean
+  theme: 'light' | 'dark' | 'auto'
+  autoOpenLastRepo: boolean
+
+  // Git 设置
+  gitUserName: string
+  gitUserEmail: string
+  sshKeyPath: string
+  autoPushAfterCommit: boolean
+  autoStashBeforePull: boolean
+
+  // 编辑器设置
+  editorFontSize: number
+  editorFontFamily: string
+  editorTabSize: number
+  editorShowWhitespace: boolean
+  editorWordWrap: boolean
+
+  // Diff 设置
+  diffContextLines: number
+  diffIgnoreWhitespace: boolean
+
+  // 性能设置
+  maxCommitHistory: number
+  diffCacheSize: number
+  enableVirtualScroll: boolean
+
+  // 实验性功能
+  enableWebWorker: boolean
+  enableGPUAcceleration: boolean
 }
 
-const DEFAULT_SETTINGS: UserSettings = {
-  editorFontSize: 14,
-  editorTabSize: 2,
-  editorWordWrap: true,
-  theme: 'auto',
+interface SettingsState {
+  settings: Settings
+
+  // Actions
+  updateSettings: (settings: Partial<Settings>) => void
+  resetSettings: () => void
+}
+
+const defaultSettings: Settings = {
+  // 通用设置
   language: 'zh-CN',
-  autoFetch: false,
-  fetchInterval: 5,
-  confirmBeforePush: true,
-  confirmBeforeDelete: true
+  theme: 'light',
+  autoOpenLastRepo: true,
+
+  // Git 设置
+  gitUserName: '',
+  gitUserEmail: '',
+  sshKeyPath: '',
+  autoPushAfterCommit: false,
+  autoStashBeforePull: true,
+
+  // 编辑器设置
+  editorFontSize: 14,
+  editorFontFamily: 'Consolas, Monaco, monospace',
+  editorTabSize: 2,
+  editorShowWhitespace: false,
+  editorWordWrap: true,
+
+  // Diff 设置
+  diffContextLines: 3,
+  diffIgnoreWhitespace: false,
+
+  // 性能设置
+  maxCommitHistory: 1000,
+  diffCacheSize: 100,
+  enableVirtualScroll: true,
+
+  // 实验性功能
+  enableWebWorker: false,
+  enableGPUAcceleration: true,
 }
 
-export const useSettingsStore = defineStore('settings', () => {
-  const settings = ref<UserSettings>({ ...DEFAULT_SETTINGS })
-  const loading = ref(false)
+/**
+ * 设置状态管理
+ * 使用 zustand 持久化存储用户设置
+ */
+export const useSettingsStore = create<SettingsState>()(
+  persist(
+    (set) => ({
+      settings: defaultSettings,
 
-  // 加载设置
-  async function loadSettings() {
-    try {
-      loading.value = true
-      const stored = localStorage.getItem('user-settings')
-      if (stored) {
-        settings.value = { ...DEFAULT_SETTINGS, ...JSON.parse(stored) }
-      }
-    } catch (error) {
-      console.error('Failed to load settings:', error)
-    } finally {
-      loading.value = false
+      // 更新设置
+      updateSettings: (newSettings) => {
+        set((state) => ({
+          settings: { ...state.settings, ...newSettings },
+        }))
+      },
+
+      // 重置设置
+      resetSettings: () => {
+        set({ settings: defaultSettings })
+      },
+    }),
+    {
+      name: 'jygit-settings',
     }
-  }
-
-  // 保存设置
-  async function saveSettings(newSettings: Partial<UserSettings>) {
-    try {
-      loading.value = true
-      settings.value = { ...settings.value, ...newSettings }
-      localStorage.setItem('user-settings', JSON.stringify(settings.value))
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-      throw error
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // 重置设置
-  async function resetSettings() {
-    try {
-      loading.value = true
-      settings.value = { ...DEFAULT_SETTINGS }
-      localStorage.removeItem('user-settings')
-    } catch (error) {
-      console.error('Failed to reset settings:', error)
-      throw error
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // 更新 Git 用户配置
-  async function updateGitConfig(userName: string, userEmail: string) {
-    try {
-      loading.value = true
-      // TODO: 调用主进程设置 Git 全局配置
-      settings.value.userName = userName
-      settings.value.userEmail = userEmail
-      await saveSettings({ userName, userEmail })
-    } catch (error) {
-      console.error('Failed to update git config:', error)
-      throw error
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return {
-    settings,
-    loading,
-    loadSettings,
-    saveSettings,
-    resetSettings,
-    updateGitConfig
-  }
-})
+  )
+)

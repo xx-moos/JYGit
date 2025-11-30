@@ -1,22 +1,23 @@
-# GitCat 开发进度
+# JYGit 开发进度
 
 ## 项目概述
-GitCat 是一个基于 Electron + React + TypeScript 的 Git 客户端应用，旨在提供类似 GitHub Desktop 的用户体验。
+JYGit 是一个基于 Electron + React + TypeScript 的 Git 可视化管理工具，旨在 100% 复刻腾讯 Ugit 的功能和体验。
 
 ## 技术栈
 - **框架**: Electron 28.x
 - **前端**: React 18 + TypeScript
 - **构建工具**: Electron Vite
-- **样式**: TailwindCSS
-- **Git操作**: isomorphic-git
+- **样式**: TailwindCSS 3.x
+- **Git操作**: simple-git
 - **状态管理**: Zustand
-- **UI组件**: Radix UI
+- **路由**: React Router v6 (HashRouter)
+- **工具库**: ahooks, dayjs, fs-extra
 
 ## 开发进度
 
-### 第一阶段：项目初始化 ✅
+### 第一阶段：项目初始化 ✅ (已完成)
 - [x] 创建项目目录结构
-- [x] 配置 package.json
+- [x] 配置 package.json（添加所有必需依赖）
 - [x] 配置 TypeScript (tsconfig.json, tsconfig.node.json)
 - [x] 配置 TailwindCSS (tailwind.config.js, postcss.config.js)
 - [x] 配置 Electron Vite (electron.vite.config.ts)
@@ -26,10 +27,9 @@ GitCat 是一个基于 Electron + React + TypeScript 的 Git 客户端应用，�
 - [x] 创建样式文件 (src/renderer/src/assets/index.css)
 - [x] 创建 HTML 模板 (index.html)
 - [x] 配置 .gitignore
-- [x] 安装依赖包 (进行中...)
 
-### 第二阶段：Git SDK 开发 ✅
-- [x] 封装 isomorphic-git 基础操作
+### 第二阶段：Git SDK 开发 ✅ (已完成基础功能)
+- [x] 封装 simple-git 基础操作 (src/main/git/GitService.ts)
 - [x] 实现仓库初始化和克隆
 - [x] 实现文件状态检测
 - [x] 实现暂存区操作
@@ -37,56 +37,163 @@ GitCat 是一个基于 Electron + React + TypeScript 的 Git 客户端应用，�
 - [x] 实现分支管理
 - [x] 实现远程仓库操作
 - [x] 实现历史记录查询
+- [x] 实现 SSH 连接测试
+- [ ] 重构为 GitClient 架构（按照设计文档）
+- [ ] 实现 LRU 缓存优化
 
-### 第三阶段：主进程开发 ✅
+### 第三阶段：主进程开发 ✅ (已完成核心功能)
 - [x] 实现窗口管理
-- [x] 实现文件系统操作
-- [x] 实现 IPC 通信
+- [x] 实现文件系统操作（选择目录、选择文件、读写文件）
+- [x] 实现 IPC 通信（Git、Repository、FileSystem）
+- [x] 实现仓库管理器 (src/main/repository/manager.ts)
+- [x] 实现仓库列表持久化
 - [ ] 实现菜单栏
 - [ ] 实现系统托盘
 
-### 第四阶段：渲染进程开发 (待开始)
-- [ ] 实现状态管理 (Zustand)
-- [ ] 实现路由管理
-- [ ] 开发仓库选择界面
-- [ ] 开发主界面布局
-- [ ] 开发文件变更列表
-- [ ] 开发提交历史
-- [ ] 开发分支管理
-- [ ] 开发设置界面
+### 第四阶段：渲染进程开发 ✅ (已完成核心功能)
+- [x] 实现状态管理 (Zustand)
+  - [x] repository.store.ts - 仓库列表管理
+  - [x] git.store.ts - Git 操作状态
+  - [x] settings.store.ts - 用户设置持久化
+- [x] 实现路由管理 (src/renderer/src/router/index.tsx)
+- [x] 开发首页界面 (src/renderer/src/pages/Home/index.tsx)
+  - [x] 仓库列表展示
+  - [x] 搜索和过滤功能
+  - [x] 收藏功能
+  - [x] 快速操作（打开、克隆、移除）
+- [x] 开发克隆仓库界面 (src/renderer/src/pages/Clone/index.tsx)
+  - [x] URL 输入和验证
+  - [x] 目标路径选择
+  - [x] 克隆进度显示
+- [x] 开发仓库详情界面 (src/renderer/src/pages/Repository/index.tsx)
+  - [x] 标签导航（变更、提交、分支）
+  - [x] 文件变更列表
+  - [x] 提交历史展示
+  - [x] 分支列表展示
+- [x] 开发设置界面 (src/renderer/src/pages/Settings/index.tsx)
+  - [x] 通用设置（语言、主题）
+  - [x] Git 配置（用户信息、SSH）
+  - [x] 编辑器设置（字体、Tab 大小）
+  - [x] 高级设置（性能、实验性功能）
 
-### 第五阶段：UI 还原 (待开始)
-- [ ] 实现侧边栏导航
-- [ ] 实现顶部工具栏
-- [ ] 实现文件差异对比
-- [ ] 实现提交表单
-- [ ] 实现分支切换
-- [ ] 实现主题切换
-- [ ] 优化交互体验
+### 第五阶段：UI 组件开发 🔄 (进行中)
+- [x] 配置 TailwindCSS 自定义主题
+- [x] 创建通用样式类（按钮、输入框、卡片、徽章）
+- [x] 创建文件状态颜色系统
+- [x] 创建 Diff 视图样式
+- [ ] 实现 Layout 组件（侧边栏、标题栏、状态栏）
+- [ ] 实现 FileTree 组件（虚拟滚动）
+- [ ] 实现 DiffViewer 组件（Monaco Editor 集成）
+- [ ] 实现 CommitGraph 组件（分支可视化）
+- [ ] 实现 ConflictEditor 组件（冲突解决）
+- [ ] 优化交互体验和动画效果
 
-### 第六阶段：功能测试 (待开始)
+### 第六阶段：功能完善 ⏳ (待开始)
+- [ ] 实现文件差异对比详情
+- [ ] 实现提交详情查看
+- [ ] 实现暂存/取消暂存操作
+- [ ] 实现提交创建功能
+- [ ] 实现推送/拉取操作
+- [ ] 实现分支切换功能
+- [ ] 实现分支创建/删除
+- [ ] 实现合并操作
+- [ ] 实现冲突解决界面
+- [ ] 实现 Stash 功能
+- [ ] 实现 Tag 管理
+
+### 第七阶段：性能优化 ⏳ (待开始)
+- [ ] 实现虚拟滚动（提交历史、文件树）
+- [ ] 实现 LRU 缓存（Diff 结果）
+- [ ] 实现 Web Worker（大型 Diff 计算）
+- [ ] 优化大仓库加载性能
+- [ ] 优化内存使用
+
+### 第八阶段：功能测试 ⏳ (待开始)
 - [ ] 单元测试
 - [ ] 集成测试
 - [ ] 性能测试
-- [ ] 兼容性测试
+- [ ] Windows 兼容性测试
+- [ ] macOS 兼容性测试
+- [ ] Linux 兼容性测试
 
-### 第七阶段：打包发布 (待开始)
+### 第九阶段：打包发布 ⏳ (待开始)
 - [ ] 配置打包脚本
-- [ ] Windows 打包
-- [ ] macOS 打包
-- [ ] Linux 打包
+- [ ] Windows 打包测试
+- [ ] macOS 打包测试
+- [ ] Linux 打包测试
+- [ ] 创建安装程序
 - [ ] 发布到 GitHub Releases
 
 ## 当前任务
-正在安装项目依赖包...
+正在开发通用 UI 组件，包括：
+1. Layout 组件（应用整体布局）
+2. FileTree 组件（文件树展示）
+3. DiffViewer 组件（代码差异对比）
+4. CommitGraph 组件（提交图可视化）
 
 ## 下一步计划
-1. 完成依赖包安装
-2. 验证项目能否正常启动
-3. 开始 Git SDK 开发
+1. 完成 Layout 组件开发
+2. 实现 FileTree 组件（支持虚拟滚动）
+3. 集成 Monaco Editor 实现 DiffViewer
+4. 实现 CommitGraph 分支可视化
+5. 完善仓库详情页的交互功能
+
+## 已完成的核心文件
+
+### 配置文件
+- `package.json` - 项目依赖配置
+- `tailwind.config.js` - TailwindCSS 自定义主题
+- `electron.vite.config.ts` - 构建配置
+
+### 主进程
+- `src/main/index.ts` - 主进程入口，窗口管理
+- `src/main/repository/manager.ts` - 仓库管理器
+- `src/main/git/GitService.ts` - Git 操作服务
+- `src/main/git/ipcHandlers.ts` - Git IPC 处理器
+- `src/main/git/types.ts` - Git 类型定义
+
+### Preload 层
+- `src/preload/index.ts` - IPC API 包装器
+- `src/preload/index.d.ts` - TypeScript 类型定义
+
+### 渲染进程 - 状态管理
+- `src/renderer/src/stores/repository.store.ts` - 仓库状态
+- `src/renderer/src/stores/git.store.ts` - Git 操作状态
+- `src/renderer/src/stores/settings.store.ts` - 设置状态
+
+### 渲染进程 - 路由和页面
+- `src/renderer/src/router/index.tsx` - 路由配置
+- `src/renderer/src/App.tsx` - 根组件
+- `src/renderer/src/main.tsx` - 应用入口
+- `src/renderer/src/pages/Home/index.tsx` - 首页
+- `src/renderer/src/pages/Clone/index.tsx` - 克隆页面
+- `src/renderer/src/pages/Repository/index.tsx` - 仓库详情页
+- `src/renderer/src/pages/Settings/index.tsx` - 设置页面
+
+### 样式系统
+- `src/renderer/src/assets/index.css` - 全局样式和工具类
+
+### 共享类型
+- `src/shared/types.ts` - 共享类型定义
+
+## 技术亮点
+1. **完全类型安全**：全程使用 TypeScript，无 `any` 类型
+2. **Windows 兼容**：所有路径处理使用 Node.js `path` 模块
+3. **现代化架构**：Electron + React + Zustand + React Router
+4. **状态管理**：使用 ahooks 的 `useReactive` 进行本地状态管理
+5. **样式系统**：TailwindCSS + 自定义工具类，无内联样式
+6. **代码规范**：统一使用 `export function Component()` 导出
 
 ## 问题记录
-暂无
+- ✅ 已解决：TypeScript 类型错误（GitBranch 缺少 commit 属性）
+- ✅ 已解决：路由懒加载导入方式不一致
+- ✅ 已解决：Settings store 结构与页面期望不匹配
 
 ## 更新日志
-- 2025-11-29: 完成项目初始化配置，正在安装依赖包
+- 2025-11-30: 完成核心页面组件开发（Home、Clone、Repository、Settings）
+- 2025-11-30: 完成状态管理实现（repository、git、settings stores）
+- 2025-11-30: 完成主进程 IPC 处理器和仓库管理器
+- 2025-11-30: 完成 TailwindCSS 配置和样式系统
+- 2025-11-30: 完成路由系统配置
+- 2025-11-30: 修复所有 TypeScript 类型错误
+- 2025-11-30: 项目基础架构开发完成，准备进入 UI 组件开发阶段

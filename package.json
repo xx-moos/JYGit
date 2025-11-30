@@ -2,7 +2,7 @@
   "name": "jygit",
   "version": "1.0.0",
   "description": "基于Electron+React的桌面Git可视化管理工具",
-  "main": "dist-electron/main/index.js",
+  "main": "./out/main/index.js",
   "author": "老王",
   "license": "MIT",
   "scripts": {
@@ -16,11 +16,16 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@monaco-editor/react": "^4.6.0",
+    "@tanstack/react-virtual": "^3.0.1",
     "dayjs": "^1.11.10",
+    "fs-extra": "^11.2.0",
+    "lru-cache": "^10.1.0",
     "simple-git": "^3.21.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.10.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",

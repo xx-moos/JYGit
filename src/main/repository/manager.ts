@@ -1,92 +1,117 @@
+import fs from 'fs-extra'
+import path from 'path'
 import { app } from 'electron'
-import { join } from 'path'
-import { promises as fs } from 'fs'
 import type { Repository } from '../../shared/types'
 
+/**
+ * 仓库管理器
+ * 负责管理本地仓库列表
+ */
 export class RepositoryManager {
-  private repositories: Map<string, Repository> = new Map()
   private configPath: string
-  private initialized = false
+  private repositories: Repository[] = []
 
   constructor() {
-    this.configPath = join(app.getPath('userData'), 'repositories.json')
+    // 配置文件路径
+    this.configPath = path.join(app.getPath('userData'), 'repositories.json')
+    this.loadRepositories()
   }
 
-  async initialize(): Promise<void> {
-    if (this.initialized) return
-
+  /**
+   * 加载仓库列表
+   */
+  private async loadRepositories(): Promise<void> {
     try {
-      const data = await fs.readFile(this.configPath, 'utf-8')
-      const repos: Repository[] = JSON.parse(data)
-      repos.forEach(repo => {
-        this.repositories.set(repo.path, repo)
-      })
+      if (await fs.pathExists(this.configPath)) {
+        const data = await fs.readJSON(this.configPath)
+        this.repositories = data.repositories || []
+      }
     } catch (error) {
-      // 文件不存在或解析失败，使用空列表
-      console.log('No existing repositories config found, starting fresh')
+      console.error('加载仓库列表失败:', error)
+      this.repositories = []
     }
-
-    this.initialized = true
   }
 
-  private async save(): Promise<void> {
-    const repos = Array.from(this.repositories.values())
-    await fs.writeFile(this.configPath, JSON.stringify(repos, null, 2), 'utf-8')
+  /**
+   * 保存仓库列表
+   */
+  private async saveRepositories(): Promise<void> {
+    try {
+      await fs.ensureDir(path.dirname(this.configPath))
+      await fs.writeJSON(this.configPath, { repositories: this.repositories }, { spaces: 2 })
+    } catch (error) {
+      console.error('保存仓库列表失败:', error)
+    }
   }
 
+  /**
+   * 获取所有仓库
+   */
   async getAll(): Promise<Repository[]> {
-    await this.initialize()
-    return Array.from(this.repositories.values())
+    return this.repositories
   }
 
-  async add(path: string): Promise<Repository> {
-    await this.initialize()
-
-    if (this.repositories.has(path)) {
-      return this.repositories.get(path)!
+  /**
+   * 添加仓库
+   */
+  async add(repoPath: string): Promise<Repository> {
+    // 检查是否已存在
+    const existing = this.repositories.find(r => r.path === repoPath)
+    if (existing) {
+      return existing
     }
 
+    // 创建新仓库记录
     const repo: Repository = {
-      path,
-      name: path.split(/[/\\]/).pop() || path,
+      path: repoPath,
+      name: path.basename(repoPath),
       lastOpened: new Date().toISOString(),
       isFavorite: false
     }
 
-    this.repositories.set(path, repo)
-    await this.save()
+    this.repositories.push(repo)
+    await this.saveRepositories()
+
     return repo
   }
 
-  async remove(path: string): Promise<void> {
-    await this.initialize()
-
-    if (!this.repositories.has(path)) {
-      throw new Error(`Repository not found: ${path}`)
-    }
-
-    this.repositories.delete(path)
-    await this.save()
+  /**
+   * 移除仓库
+   */
+  async remove(repoPath: string): Promise<void> {
+    this.repositories = this.repositories.filter(r => r.path !== repoPath)
+    await this.saveRepositories()
   }
 
-  async update(path: string, data: Partial<Repository>): Promise<Repository> {
-    await this.initialize()
-
-    const repo = this.repositories.get(path)
-    if (!repo) {
-      throw new Error(`Repository not found: ${path}`)
+  /**
+   * 更新仓库信息
+   */
+  async update(repoPath: string, data: Partial<Repository>): Promise<void> {
+    const repo = this.repositories.find(r => r.path === repoPath)
+    if (repo) {
+      Object.assign(repo, data)
+      await this.saveRepositories()
     }
-
-    const updated = { ...repo, ...data, path } // path 不能被修改
-    this.repositories.set(path, updated)
-    await this.save()
-    return updated
   }
 
-  async updateLastOpened(path: string): Promise<void> {
-    await this.update(path, { lastOpened: new Date().toISOString() })
+  /**
+   * 更新最后打开时间
+   */
+  async updateLastOpened(repoPath: string): Promise<void> {
+    await this.update(repoPath, { lastOpened: new Date().toISOString() })
+  }
+
+  /**
+   * 切换收藏状态
+   */
+  async toggleFavorite(repoPath: string): Promise<void> {
+    const repo = this.repositories.find(r => r.path === repoPath)
+    if (repo) {
+      repo.isFavorite = !repo.isFavorite
+      await this.saveRepositories()
+    }
   }
 }
 
-// 单例实例
+// 导出单例
 export const repositoryManager = new RepositoryManager()
