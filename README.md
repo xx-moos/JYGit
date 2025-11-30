@@ -13,7 +13,7 @@ JYGit 是一个基于 Electron + React + TypeScript 开发的桌面 Git 可视�
 - **Git 操作**: simple-git
 - **UI 组件**: 自定义组件
 - **路由**: React Router DOM
-- **Hooks**: ahooks
+- **Hooks**: ahooks znabushuyao 
 
 ## 功能特性
 
