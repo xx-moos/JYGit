@@ -8,9 +8,9 @@ JYGit 是一个基于 Electron + React + TypeScript 开发的桌面 Git 可视�
 
 - **框架**: Electron 28.x
 - **前端**: React 18 + TypeScript
-- **构建工具**: Electron Vite
+- **构建工具**: Electron Vite nishei
 - **样式**: TailwindCSS
-- **Git 操作**: simple-git
+- **Git 操作**: simple-git zaizhe 
 - **UI 组件**: 自定义组件
 - **路由**: React Router DOM
 - **Hooks**: ahooks znabushuyao 
