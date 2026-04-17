@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__filesystem__directory_tree",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__memory__read_graph",
+      "mcp__augment-context-engine__codebase-retrieval",
+      "mcp__filesystem__list_allowed_directories",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__search_files",
+      "Bash(git -C \"/e/code/fe/git-code/JYGit\" status --short --branch)",
+      "Bash(git -C \"/e/code/fe/git-code/JYGit\" rev-parse --show-toplevel)",
+      "Bash(git -C \"/e/code/fe/git-code/JYGit\" ls-tree --name-only -r HEAD)",
+      "Bash(git ls-tree *)",
+      "Bash(git *)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__filesystem__create_directory"
+    ]
+  }
+}

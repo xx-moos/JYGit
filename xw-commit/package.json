@@ -1,0 +1,56 @@
+{
+  "name": "xw-commit",
+  "displayName": "xw-commit",
+  "description": "通过本地配置的 OpenAI 兼容后端，为当前仓库全部改动生成 Git 提交信息，并写入 Git 面板输入框。",
+  "version": "0.1.0",
+  "publisher": "xw",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "xwCommit.generateMessage",
+        "title": "xw-commit",
+        "icon": "$(sparkle)"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "xwCommit.generateMessage",
+          "group": "navigation",
+          "when": "scmProvider == git"
+        }
+      ],
+      "scm/resourceGroup/context": [],
+      "commandPalette": [
+        {
+          "command": "xwCommit.generateMessage"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.4.0"
+  }
+}
