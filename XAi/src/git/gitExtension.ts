@@ -26,6 +26,7 @@ export interface GitRepository {
   diff(cached?: boolean): Promise<string>;
   diffWithHEAD(): Promise<string>;
   diffIndexWithHEAD(): Promise<string>;
+  status(): Promise<void>;
 }
 
 export interface GitAPI {

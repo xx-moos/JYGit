@@ -22,7 +22,7 @@
     "commands": [
       {
         "command": "xwCommit.generateMessage",
-        "title": "XAi-生成提交信息",
+        "title": "xai-xgc: 生成提交信息",
         "icon": "$(code)"
       }
     ],

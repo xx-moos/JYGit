@@ -37,6 +37,9 @@ export async function generateMessageCommand(scm?: vscode.SourceControl): Promis
         const api = await getGitAPI();
         const repo = resolveCurrentRepository(api, scm);
 
+        progress.report({ message: '刷新 Git 状态' });
+        await repo.status();
+
         progress.report({ message: '收集改动' });
         const summary = await collectRepoChanges(repo);
         if (summary.isEmpty) {
