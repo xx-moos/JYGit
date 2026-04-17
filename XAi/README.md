@@ -4,7 +4,7 @@
 
 ## 配置
 
-在用户目录创建 `~/.XAi/config.json`（Windows 为 `%USERPROFILE%/.XAi/config.json`）：
+在用户目录创建 `~/.xai/config.json`（Windows 为 `%USERPROFILE%/.xai/config.json`）：
 
 ```json
 {
