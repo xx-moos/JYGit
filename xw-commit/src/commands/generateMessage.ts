@@ -26,7 +26,7 @@ export async function generateMessageCommand(scm?: vscode.SourceControl): Promis
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.SourceControl,
-        title: 'xw-commit 正在生成提交信息',
+        title: 'XAi 正在生成提交信息',
         cancellable: false,
       },
       async (progress) => {

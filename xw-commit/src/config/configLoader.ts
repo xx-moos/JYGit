@@ -19,7 +19,7 @@ export class ConfigParseError extends Error {
 }
 
 export function getConfigPath(): string {
-  return path.join(os.homedir(), '.xw-commit', 'config.json');
+  return path.join(os.homedir(), '.xai', 'config.json');
 }
 
 export async function loadConfig(): Promise<XwCommitConfig> {

@@ -1,10 +1,10 @@
-# xw-commit
+# XAi
 
-在 VS Code Git 面板中点击 `xw-commit` 按钮，基于当前仓库全部改动通过 OpenAI 兼容后端生成提交信息，并写入 Git 提交输入框。
+在 VS Code Git 面板中点击 `XAi` 按钮，基于当前仓库全部改动通过 OpenAI 兼容后端生成提交信息，并写入 Git 提交输入框。
 
 ## 配置
 
-在用户目录创建 `~/.xw-commit/config.json`（Windows 为 `%USERPROFILE%/.xw-commit/config.json`）：
+在用户目录创建 `~/.XAi/config.json`（Windows 为 `%USERPROFILE%/.XAi/config.json`）：
 
 ```json
 {
@@ -23,5 +23,5 @@
 
 1. 在仓库中修改代码
 2. 打开 VS Code Git 面板
-3. 点击标题栏中的 `xw-commit` 按钮
+3. 点击标题栏中的 `XAi` 按钮
 4. 生成的提交信息将写入 Git 输入框，由用户手动确认提交
