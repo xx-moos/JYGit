@@ -2,7 +2,7 @@
   "name": "XAi",
   "displayName": "XAi",
   "description": "通过本地配置的 OpenAI 兼容后端，为当前仓库全部改动生成 Git 提交信息，并写入 Git 面板输入框。",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "publisher": "xw",
   "engines": {
     "vscode": "^1.75.0"
