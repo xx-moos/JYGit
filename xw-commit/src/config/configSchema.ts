@@ -71,7 +71,9 @@ export function validateConfig(raw: RawConfig): XwCommitConfig {
     baseURL: validateBaseURL(raw.baseURL),
     apiKey: requireNonEmptyString(raw.apiKey, 'apiKey'),
     model: requireNonEmptyString(raw.model, 'model'),
-    prompt: requireNonEmptyString(raw.prompt, 'prompt'),
+    prompt: raw.prompt !== undefined && raw.prompt !== null
+      ? requireNonEmptyString(raw.prompt, 'prompt')
+      : '',
     timeoutMs: validatePositiveNumber(raw.timeoutMs, 'timeoutMs', DEFAULT_TIMEOUT_MS),
     maxDiffChars: validatePositiveNumber(raw.maxDiffChars, 'maxDiffChars', DEFAULT_MAX_DIFF_CHARS),
     temperature: validateTemperature(raw.temperature),

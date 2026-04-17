@@ -22,6 +22,21 @@ export function getConfigPath(): string {
   return path.join(os.homedir(), '.xai', 'config.json');
 }
 
+export function getPromptDocPath(): string {
+  return path.join(os.homedir(), '.xai', 'doc.md');
+}
+
+async function loadPromptFromDoc(): Promise<string | null> {
+  const docPath = getPromptDocPath();
+  try {
+    const content = await fs.promises.readFile(docPath, 'utf8');
+    const trimmed = content.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function loadConfig(): Promise<XwCommitConfig> {
   const configPath = getConfigPath();
   let raw: string;
@@ -42,12 +57,26 @@ export async function loadConfig(): Promise<XwCommitConfig> {
     throw new ConfigParseError(configPath, err as Error);
   }
 
+  let config: import('../types/config').XwCommitConfig;
   try {
-    return validateConfig(parsed);
+    config = validateConfig(parsed);
   } catch (err) {
     if (err instanceof ConfigValidationError) {
       throw err;
     }
     throw new ConfigValidationError((err as Error).message);
   }
+
+  const docPrompt = await loadPromptFromDoc();
+  if (docPrompt) {
+    config = { ...config, prompt: docPrompt };
+  }
+
+  if (!config.prompt) {
+    throw new ConfigValidationError(
+      '未找到提示词：请在 ~/.xai/doc.md 中编写提示词，或在 config.json 中配置 prompt 字段'
+    );
+  }
+
+  return config;
 }

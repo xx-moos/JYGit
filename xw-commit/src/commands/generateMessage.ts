@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { ConfigNotFoundError, ConfigParseError, loadConfig } from '../config/configLoader';
 import { ConfigValidationError } from '../config/configSchema';
-import { UnresolvedConflictError, collectRepoChanges } from '../git/diffProvider';
+import { collectRepoChanges } from '../git/diffProvider';
 import { GitExtensionUnavailableError, getGitAPI } from '../git/gitExtension';
 import { NoRepositoryError, resolveCurrentRepository } from '../git/repositoryResolver';
 import {
@@ -52,12 +52,8 @@ export async function generateMessageCommand(scm?: vscode.SourceControl): Promis
         const commitMessage = extractCommitMessage(response);
 
         progress.report({ message: '写入输入框' });
-        const result = await writeCommitMessage(repo, commitMessage);
-        if (result === 'written') {
-          showInfo('已写入提交信息');
-        } else {
-          showWarn('已取消写入，保留原有内容');
-        }
+        await writeCommitMessage(repo, commitMessage);
+        showInfo('已写入提交信息');
       }
     );
   } catch (err) {
@@ -85,10 +81,6 @@ function handleError(err: unknown): void {
     return;
   }
   if (err instanceof NoRepositoryError) {
-    showError(err.message);
-    return;
-  }
-  if (err instanceof UnresolvedConflictError) {
     showError(err.message);
     return;
   }

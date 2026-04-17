@@ -3,13 +3,6 @@ import * as vscode from 'vscode';
 import type { RepoChangeSummary } from '../types/git';
 import type { GitChange, GitRepository } from './gitExtension';
 
-export class UnresolvedConflictError extends Error {
-  constructor() {
-    super('当前仓库存在未解决的合并冲突，请先处理冲突再生成提交信息');
-    this.name = 'UnresolvedConflictError';
-  }
-}
-
 const UNTRACKED_FILE_PREVIEW_BYTES = 2000;
 const MAX_UNTRACKED_FILES_PREVIEW = 20;
 
@@ -77,10 +70,6 @@ async function buildUntrackedSummary(
 
 export async function collectRepoChanges(repo: GitRepository): Promise<RepoChangeSummary> {
   const state = repo.state;
-
-  if (state.mergeChanges.length > 0) {
-    throw new UnresolvedConflictError();
-  }
 
   const branch = state.HEAD?.name ?? '(detached)';
   const repoName = path.basename(repo.rootUri.fsPath);
